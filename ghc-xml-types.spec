@@ -1,12 +1,12 @@
 %define		pkgname	xml-types
 Summary:	A Haskell binding to the xml-types graphics library
 Name:		ghc-%{pkgname}
-Version:	0.3.3
+Version:	0.3.6
 Release:	1
 License:	BSD
 Group:		Development/Languages
 Source0:	http://hackage.haskell.org/packages/archive/%{pkgname}/%{version}/%{pkgname}-%{version}.tar.gz
-# Source0-md5:	adc340bd3f4a762f5d91b66139c95507
+# Source0-md5:	d8ca51cebbc1c0977edb6faabe40418e
 URL:		http://hackage.haskell.org/package/xml-types/
 BuildRequires:	ghc >= 6.12.3
 BuildRequires:	ghc-text
