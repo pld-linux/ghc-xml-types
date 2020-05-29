@@ -1,8 +1,12 @@
+#
+# Conditional build:
+%bcond_without	prof	# profiling library
+#
 %define		pkgname	xml-types
 Summary:	A Haskell binding to the xml-types graphics library
 Name:		ghc-%{pkgname}
 Version:	0.3.6
-Release:	1
+Release:	2
 License:	BSD
 Group:		Development/Languages
 Source0:	http://hackage.haskell.org/packages/archive/%{pkgname}/%{version}/%{pkgname}-%{version}.tar.gz
@@ -10,6 +14,10 @@ Source0:	http://hackage.haskell.org/packages/archive/%{pkgname}/%{version}/%{pkg
 URL:		http://hackage.haskell.org/package/xml-types/
 BuildRequires:	ghc >= 6.12.3
 BuildRequires:	ghc-text
+%if %{with prof}
+BuildRequires:	ghc-prof
+BuildRequires:	ghc-text-prof
+%endif
 BuildRequires:	rpmbuild(macros) >= 1.608
 %requires_eq	ghc
 Requires:	ghc-text
@@ -20,6 +28,21 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 A Haskell binding to the xml-types graphics library.
+
+%package prof
+Summary:	Profiling %{pkgname} library for GHC
+Summary(pl.UTF-8):	Biblioteka profilująca %{pkgname} dla GHC
+Group:		Development/Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	ghc-text-prof
+
+%description prof
+Profiling %{pkgname} library for GHC.  Should be installed when
+GHC's profiling subsystem is needed.
+
+%description prof -l pl.UTF-8
+Biblioteka profilująca %{pkgname} dla GHC. Powinna być zainstalowana
+kiedy potrzebujemy systemu profilującego z GHC.
 
 %package doc
 Summary:	HTML documentation for %{pkgname}
@@ -37,6 +60,7 @@ Dokumentacja w formacie HTML dla %{pkgname}.
 
 %build
 runhaskell Setup.hs configure -v2 \
+	%{?with_prof:--enable-library-profiling} \
 	--prefix=%{_prefix} \
 	--libdir=%{_libdir} \
 	--libexecdir=%{_libexecdir} \
@@ -71,7 +95,22 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %{_libdir}/%{ghcdir}/package.conf.d/%{pkgname}.conf
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.so
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.a
+%exclude %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*_p.a
+
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/XML
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/XML/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/XML/*.dyn_hi
+
+%if %{with prof}
+%files prof
+%defattr(644,root,root,755)
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*_p.a
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/XML/*.p_hi
+%endif
 
 %files doc
 %defattr(644,root,root,755)
